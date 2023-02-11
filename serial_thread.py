@@ -10,7 +10,7 @@ class SerialThread(QObject):
     readFailed = pyqtSignal(str)
     dataReceived = pyqtSignal(bytes)
 
-    def __init__(self, serial_instance, write_signal=None):
+    def __init__(self, serial_instance):
         """\
         Initialize thread.
         Note that the serial_instance' timeout is set to one second!
@@ -19,9 +19,6 @@ class SerialThread(QObject):
         QObject.__init__(self)
         self.serial = serial_instance
         self.alive = True
-
-        self.writeSignal = write_signal
-        self.writeSignal.connect(self.write)
 
     def stop(self):
         """Stop the reader thread"""
