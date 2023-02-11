@@ -8,8 +8,6 @@ from serial_thread import SerialThread
 
 class UI(QWidget):
 
-    writeToSerial = pyqtSignal(bytes)
-
     def __init__(self):
         super().__init__()
 
@@ -21,7 +19,7 @@ class UI(QWidget):
         self.serial_port.port = "COM3"
 
         # Initiate Serial Thread
-        self.serialThread = SerialThread(self.serial_port, write_signal=self.writeToSerial)
+        self.serialThread = SerialThread(self.serial_port)
         self._thread = QThread()
         self.serialThread.moveToThread(self._thread)
 
@@ -55,8 +53,6 @@ class UI(QWidget):
         try:
             message = unicode(data, errors='ignore')
             self.outputBox.insertPlainText(message)
-
-            #self.writeToSerial.emit('hello'.encode('utf-8'))
         except Exception as e:
             print(str(e))
 
