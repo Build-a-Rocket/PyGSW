@@ -62,7 +62,9 @@ class UI(QWidget):
                 message = self.allData[s + 5:e + 3].split(',')
                 self.allData = self.allData[e + 3:]
 
-                self.outputBox.insertPlainText(message)
+                telemetry = 'Altitude: %f\nTemperature: %f\n\n' % (message[0], message[1]) 
+
+                self.outputBox.insertPlainText(telemetry)
 
         except Exception as e:
             print(str(e))
