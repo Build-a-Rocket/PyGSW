@@ -16,7 +16,7 @@ class UI(QWidget):
 
         # Initiate serial port
         self.serial_port = Serial(None, 115200, dsrdtr=True)
-        self.serial_port.port = "COM12"
+        self.serial_port.port = "COM3"
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
@@ -62,9 +62,10 @@ class UI(QWidget):
                 message = self.allData[s + 5:e + 3].split(',')
                 self.allData = self.allData[e + 3:]
 
-                telemetry = 'Altitude: %f\nTemperature: %f\n\n' % (message[0], message[1]) 
+                telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (message[1], message[2])
 
                 self.outputBox.insertPlainText(telemetry)
+                self.outputBox.ensureCursorVisible()
 
         except Exception as e:
             print(str(e))
