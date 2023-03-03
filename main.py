@@ -59,10 +59,13 @@ class UI(QWidget):
                 s = self.allData.find('START')
                 e = self.allData.find('END')
 
-                message = self.allData[s + 5:e + 3].split(',')
+                data = self.allData[s + 5:e + 3].split(',')
                 self.allData = self.allData[e + 3:]
 
-                telemetry = 'Altitude: %s\nTemperature: %s\n\n' % (message[1], message[2])
+                telemetry = 'Altitude: %s\nTemperature: %s\n'\
+                            'Accel X: %s\nAccel Y: %s\nAccel Z: %s\n'\
+                            'Gyro X: %s\nGyro Y: %s\nGyro Z: %s\n\n'\
+                            % (data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8])
 
                 self.outputBox.insertPlainText(telemetry)
                 self.outputBox.ensureCursorVisible()
