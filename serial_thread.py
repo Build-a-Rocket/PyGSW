@@ -18,6 +18,7 @@ class SerialThread(QObject):
         """
         QObject.__init__(self)
         self.serial = serial_instance
+        self.serial.close()
         self.alive = True
 
     def stop(self):

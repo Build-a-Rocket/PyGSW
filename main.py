@@ -1,9 +1,13 @@
-from PyQt6.QtCore import QThread, pyqtSignal, QMetaObject
-from PyQt6.QtWidgets import QApplication, QWidget, QTextEdit, QPushButton
+import random
+
+from PyQt6.QtCore import QThread
+from PyQt6.QtWidgets import QApplication, QWidget, QTextEdit
 from PyQt6 import uic, QtCore
+from pyqtgraph import PlotWidget
 from serial import Serial, unicode
 
 from serial_thread import SerialThread
+from tele_graph import TelemetryGraph
 
 
 class UI(QWidget):
@@ -12,11 +16,10 @@ class UI(QWidget):
         super().__init__()
 
         # loading the ui file with uic module
-        uic.loadUi("gsw.ui", self)
+        uic.loadUi('gsw.ui', self)
 
         # Initiate serial port
-        self.serial_port = Serial(None, 115200, dsrdtr=True)
-        self.serial_port.port = "COM3"
+        self.serial_port = Serial('COM3', 115200, dsrdtr=True)
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
@@ -29,18 +32,39 @@ class UI(QWidget):
 
         self._thread.started.connect(self.serialThread.run)
 
-        self.allData = ""
+        self.allData = ''
 
-        self._thread.start()
-
-        self.outputBox = self.findChild(QTextEdit, "outputBox")
+        self.outputBox = self.findChild(QTextEdit, 'outputBox')
         self.serialThread.dataReceived.connect(self.updateOutputBox)
 
-        self.sendButton = self.findChild(QPushButton, "sendButton")
+        # setup graphs
+        self.altitudeGraph = TelemetryGraph(self.findChild(PlotWidget, 'altitudeGraph'))
+        self.altitudeGraph.setTitle('Altitude')
+        self.altitudeGraph.addLine()
+
+        self.tempGraph = TelemetryGraph(self.findChild(PlotWidget, 'tempGraph'))
+        self.tempGraph.setTitle('Temperature')
+        self.tempGraph.addLine()
+
+        self.accelGraph = TelemetryGraph(self.findChild(PlotWidget, 'accelGraph'), legend=True)
+        self.accelGraph.setTitle('Acceleration')
+        self.accelGraph.addLine('x', 'red')
+        self.accelGraph.addLine('y', 'green')
+        self.accelGraph.addLine('z', 'blue')
+
+        self.gyroGraph = TelemetryGraph(self.findChild(PlotWidget, 'gyroGraph'), legend=True)
+        self.gyroGraph.setTitle('Gyro')
+        self.gyroGraph.addLine('x', 'red')
+        self.gyroGraph.addLine('y', 'green')
+        self.gyroGraph.addLine('z', 'blue')
+
+        self.y = 0
+
+        self._thread.start()  # do this last!!!! this will make the serial port start reading
 
     @QtCore.pyqtSlot()
     def connection_success(self):
-        print("Connected!")
+        print('Connected!')
 
     @QtCore.pyqtSlot(str)
     def connection_failed(self, error):
@@ -69,6 +93,19 @@ class UI(QWidget):
 
                 self.outputBox.insertPlainText(telemetry)
                 self.outputBox.ensureCursorVisible()
+
+                self.y += 1
+
+                self.altitudeGraph.plotData(float(data[1]), self.y)
+                self.tempGraph.plotData(float(data[2]), self.y)
+
+                self.accelGraph.plotData(float(data[3]), self.y, name='x')
+                self.accelGraph.plotData(float(data[4]), self.y, name='y')
+                self.accelGraph.plotData(float(data[5]), self.y, name='z')
+
+                self.gyroGraph.plotData(float(data[6]), self.y, name='x')
+                self.gyroGraph.plotData(float(data[7]), self.y, name='y')
+                self.gyroGraph.plotData(float(data[8]), self.y, name='z')
 
         except Exception as e:
             print(str(e))
