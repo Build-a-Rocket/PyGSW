@@ -35,6 +35,7 @@ class UI(QWidget):
         self.allData = ''
 
         self.outputBox = self.findChild(QTextEdit, 'outputBox')
+        self.messageBox = self.findChild(QTextEdit, 'messageBox')
         self.serialThread.dataReceived.connect(self.updateOutputBox)
 
         # setup graphs
@@ -79,11 +80,11 @@ class UI(QWidget):
         try:
             self.allData += unicode(data, errors='ignore')
 
-            if self.allData.find('START') != -1 and self.allData.find('END') != -1:
-                s = self.allData.find('START')
-                e = self.allData.find('END')
+            if self.allData.find('TSP') != -1 and self.allData.find('TEP') != -1:
+                s = self.allData.find('TSP')
+                e = self.allData.find('TEP')
 
-                data = self.allData[s + 5:e + 3].split(',')
+                data = self.allData[s + 3:e + 3].split(',')
                 self.allData = self.allData[e + 3:]
 
                 telemetry = 'Altitude: %s\nTemperature: %s\n'\
@@ -106,6 +107,16 @@ class UI(QWidget):
                 self.gyroGraph.plotData(float(data[6]), self.y, name='x')
                 self.gyroGraph.plotData(float(data[7]), self.y, name='y')
                 self.gyroGraph.plotData(float(data[8]), self.y, name='z')
+
+            if self.allData.find('MSP') != -1 and self.allData.find('MEP') != -1:
+                s = self.allData.find('MSP')
+                e = self.allData.find('MEP')
+
+                message = self.allData[s + 3:e + 3]
+                self.allData = self.allData[e + 3:]
+
+                self.messageBox.insertPlainText(message)
+                self.messageBox.ensureCursorVisible()
 
         except Exception as e:
             print(str(e))
