@@ -19,7 +19,7 @@ class UI(QWidget):
         uic.loadUi('gsw.ui', self)
 
         # Initiate serial port
-        self.serial_port = Serial('COM3', 115200, dsrdtr=True)
+        self.serial_port = Serial('COM3', 2000000, dsrdtr=True)
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
