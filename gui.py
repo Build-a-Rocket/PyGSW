@@ -1,8 +1,9 @@
-import random
-
 from PyQt6 import uic
-from PyQt6.QtCore import QTimer
-from PyQt6.QtWidgets import QWidget, QApplication, QTextEdit, QPushButton, QProgressBar
+from PyQt6.QtCore import QThread
+from PyQt6.QtWidgets import QWidget, QTextEdit, QPushButton, QApplication
+from serial import Serial, unicode
+
+from serial_thread import SerialThread
 
 
 class UI(QWidget):
@@ -13,21 +14,27 @@ class UI(QWidget):
 
         self.textEdit = self.findChild(QTextEdit, "textEdit")
         self.pushButton = self.findChild(QPushButton, "pushButton")
-        self.progressBar = self.findChild(QProgressBar, "progressBar")
 
         self.pushButton.clicked.connect(self.button_pushed)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_progress)
-        self.timer.start(1000)
+        serial = Serial('COM18', 2000000, dsrdtr=True)
+        self.serialThread = SerialThread(serial)
+
+        self._thread = QThread()
+        self.serialThread.moveToThread(self._thread)
+        self._thread.started.connect(self.serialThread.run)
+
+        self.serialThread.dataReceived.connect(self.on_dataReceived)
+
+        self._thread.start()
+
+    def on_dataReceived(self, data):
+        self.textEdit.insertPlainText(unicode(data, errors='ignore'))
+        self.textEdit.ensureCursorVisible()
 
     def button_pushed(self):
         self.textEdit.insertPlainText('hello world\n')
         self.textEdit.ensureCursorVisible()
-
-    def update_progress(self):
-        self.progressBar.setValue(random.randint(0, 100))
-        self.timer.start(1000)
 
 
 app = QApplication([])
