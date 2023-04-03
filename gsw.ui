@@ -97,7 +97,7 @@ background-color: rgb(0, 255, 255)
         </widget>
        </item>
        <item row="0" column="0">
-        <widget class="QTextEdit" name="textEdit_2">
+        <widget class="QTextEdit" name="messageBox">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
            <horstretch>0</horstretch>

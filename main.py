@@ -19,7 +19,7 @@ class UI(QWidget):
         uic.loadUi('gsw.ui', self)
 
         # Initiate serial port
-        self.serial_port = Serial('COM3', 2000000, dsrdtr=True)
+        self.serial_port = Serial('COM18', 2000000, dsrdtr=True)
 
         # Initiate Serial Thread
         self.serialThread = SerialThread(self.serial_port)
@@ -32,7 +32,7 @@ class UI(QWidget):
 
         self._thread.started.connect(self.serialThread.run)
 
-        self.allData = ''
+        self.telemetryBuffer = ''
 
         self.outputBox = self.findChild(QTextEdit, 'outputBox')
         self.messageBox = self.findChild(QTextEdit, 'messageBox')
@@ -78,14 +78,14 @@ class UI(QWidget):
     @QtCore.pyqtSlot(bytes)
     def updateOutputBox(self, data):
         try:
-            self.allData += unicode(data, errors='ignore')
+            self.telemetryBuffer += unicode(data, errors='ignore')
 
-            if self.allData.find('TSP') != -1 and self.allData.find('TEP') != -1:
-                s = self.allData.find('TSP')
-                e = self.allData.find('TEP')
+            if self.telemetryBuffer.find('TSP') != -1 and self.telemetryBuffer.find('TEP') != -1:
+                s = self.telemetryBuffer.find('TSP')
+                e = self.telemetryBuffer.find('TEP')
 
-                data = self.allData[s + 3:e + 3].split(',')
-                self.allData = self.allData[e + 3:]
+                data = self.telemetryBuffer[s + 3:e + 3].split(',')
+                self.telemetryBuffer = self.telemetryBuffer[e + 3:]
 
                 telemetry = 'Altitude: %s\nTemperature: %s\n'\
                             'Accel X: %s\nAccel Y: %s\nAccel Z: %s\n'\
@@ -108,15 +108,16 @@ class UI(QWidget):
                 self.gyroGraph.plotData(float(data[7]), self.y, name='y')
                 self.gyroGraph.plotData(float(data[8]), self.y, name='z')
 
-            if self.allData.find('MSP') != -1 and self.allData.find('MEP') != -1:
-                s = self.allData.find('MSP')
-                e = self.allData.find('MEP')
+            if self.telemetryBuffer.find('MSP') != -1 and self.telemetryBuffer.find('MEP') != -1:
+                s = self.telemetryBuffer.find('MSP')
+                e = self.telemetryBuffer.find('MEP')
 
-                message = self.allData[s + 3:e + 3]
-                self.allData = self.allData[e + 3:]
+                message = self.telemetryBuffer[s + 3:e]
+                self.telemetryBuffer = self.telemetryBuffer[e + 3:]
 
-                self.messageBox.insertPlainText(message)
-                self.messageBox.ensureCursorVisible()
+                if len(message) > 0:
+                    self.messageBox.insertPlainText(message + '\n')
+                    self.messageBox.ensureCursorVisible()
 
         except Exception as e:
             print(str(e))
