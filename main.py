@@ -5,10 +5,17 @@ from PyQt6.QtWidgets import QApplication, QWidget, QTextEdit
 from PyQt6 import uic, QtCore
 from pyqtgraph import PlotWidget
 from serial import Serial, unicode
+import csv
+import datetime as dt
 
 from serial_thread import SerialThread
 from tele_graph import TelemetryGraph
 
+csvname = str(dt.datetime.now().strftime("%m-%d-%Y %H-%M-%S"))+'.csv'
+header = ['Altitude','Temperature','AccelX','AccelY','AccelZ','GyroX','GyroY','GyroZ']
+with open(csvname, 'w',newline='') as setup:
+        write = csv.writer(setup)
+        write.writerow(header)
 
 class UI(QWidget):
 
@@ -107,7 +114,13 @@ class UI(QWidget):
                 self.gyroGraph.plotData(float(data[6]), self.y, name='x')
                 self.gyroGraph.plotData(float(data[7]), self.y, name='y')
                 self.gyroGraph.plotData(float(data[8]), self.y, name='z')
+                
+                csvdata=[data[1], data[2], data[3], data[4], data[5], data[6], data[7], data[8]]
 
+                with open(csvname, 'a',newline='') as bean:
+                    writer = csv.writer(bean)
+                    writer.writerow(csvdata)
+            
             if self.telemetryBuffer.find('MSP') != -1 and self.telemetryBuffer.find('MEP') != -1:
                 s = self.telemetryBuffer.find('MSP')
                 e = self.telemetryBuffer.find('MEP')
