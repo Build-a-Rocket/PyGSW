@@ -6,6 +6,8 @@ from PyQt6.QtCore import QThread
 from serial_thread import SerialThread
 from serial import unicode
 
+from tele_graph import PlotWidget, TelemetryGraph
+
 class UI(QWidget):
     def __init__(self):
         super().__init__()
@@ -15,6 +17,14 @@ class UI(QWidget):
 
         serial_port = "04-16-2023_16-25-07.csv"
         self.serialStream = SerialThread(serial_port, fake=True)
+        self.x = 0
+        
+        self.gyroGraph = TelemetryGraph(self.findChild(PlotWidget, "gyroGraph"))
+        self.gyroGraph.setTitle(name="Gyroscope Graph")
+        self.gyroGraph.addLine(name="GyroX", color="red")
+        self.gyroGraph.addLine(name="GyroY", color="green")
+        self.gyroGraph.addLine(name="GyroZ", color="blue")
+
 
         self.myThread = QThread()
         self.serialStream.moveToThread(self.myThread)    
@@ -23,6 +33,10 @@ class UI(QWidget):
         self.serialStream.dataReceived.connect(self.printSerial)  
 
         self.myThread.start()
+
+
+
+
 
 
     def buttonClick(self):
@@ -41,8 +55,14 @@ class UI(QWidget):
         printdata += "AccelY: " + data[6] + "\n"
         printdata += "AccelZ: " + data[7] + "\n"
         printdata += "Accel Mag: " + data[8] + "\n"
+        self.x+=1
+        self.gyroGraph.plotData(float(data[2]), self.x, "GyroX")
+        self.gyroGraph.plotData(float(data[3]), self.x, "GyroY")
+        self.gyroGraph.plotData(float(data[4]), self.x, "GyroZ")
+
         self.textBox.setText(printdata)
         print(data)
+        
 
 app = QApplication([])
 window = UI()
