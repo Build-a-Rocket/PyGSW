@@ -25,6 +25,20 @@ class UI(QWidget):
         self.gyroGraph.addLine(name="GyroY", color="green")
         self.gyroGraph.addLine(name="GyroZ", color="blue")
 
+        self.accelGraph = TelemetryGraph(self.findChild(PlotWidget, "accelGraph"))
+        self.accelGraph.setTitle(name="Acceleration Graph")
+        self.accelGraph.addLine(name="AccelX", color="red")
+        self.accelGraph.addLine(name="AccelY", color="green")
+        self.accelGraph.addLine(name="AccelZ", color="blue")
+
+
+        self.altitudeGraph = TelemetryGraph(self.findChild(PlotWidget, "altitudeGraph"))
+        self.altitudeGraph.setTitle(name="Altitude Graph")
+        self.altitudeGraph.addLine(name="Altitude", color="black")
+
+        self.tempGraph = TelemetryGraph(self.findChild(PlotWidget, "tempGraph"))
+        self.tempGraph.setTitle(name="Temperature Graph")
+        self.tempGraph.addLine(name="Temp", color="black")
 
         self.myThread = QThread()
         self.serialStream.moveToThread(self.myThread)    
@@ -59,6 +73,16 @@ class UI(QWidget):
         self.gyroGraph.plotData(float(data[2]), self.x, "GyroX")
         self.gyroGraph.plotData(float(data[3]), self.x, "GyroY")
         self.gyroGraph.plotData(float(data[4]), self.x, "GyroZ")
+
+        self.accelGraph.plotData(float(data[5]), self.x, "AccelX")
+        self.accelGraph.plotData(float(data[6]), self.x, "AccelY")
+        self.accelGraph.plotData(float(data[7]), self.x, "AccelZ")
+        
+        self.altitudeGraph.plotData(float(data[0]), self.x, "Altitude")
+
+        self.tempGraph.plotData(float(data[1]), self.x, "Temp")
+        
+
 
         self.textBox.setText(printdata)
         print(data)
