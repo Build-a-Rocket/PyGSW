@@ -30,8 +30,18 @@ class UI(QWidget):
 
     def printSerial(self, data):
         data = unicode(data, errors='ignore')
-
-        self.textBox.setText(data)
+        data = data.split(',')
+        printdata = "\n"
+        printdata += "Altitude: " + data[0] + "\n"
+        printdata += "Temperature: " + data[1] + "\n"
+        printdata += "GyroX: " + data[2] + "\n"
+        printdata += "GyroY: " + data[3] + "\n"
+        printdata += "GyroZ: " + data[4] + "\n"
+        printdata += "AccelX: " + data[5] + "\n"
+        printdata += "AccelY: " + data[6] + "\n"
+        printdata += "AccelZ: " + data[7] + "\n"
+        printdata += "Accel Mag: " + data[8] + "\n"
+        self.textBox.setText(printdata)
         print(data)
 
 app = QApplication([])
