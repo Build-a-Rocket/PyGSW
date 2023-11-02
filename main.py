@@ -8,7 +8,7 @@ class UI(QWidget):
         super().__init__()
 
         # loading the ui file with uic module
-        uic.loadUi('gsw.ui', self)
+        uic.loadUi('main.ui', self)
 
 
 app = QApplication([])
