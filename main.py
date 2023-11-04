@@ -47,7 +47,7 @@ class UI(QWidget):
         self.y = 0
         self.xdir = 1
         self.ydir = 0
-        self.score = 5
+        self.score = 100
         self.scoreLabel.setText("Score: " + str(self.score))
         
         self.createApple()
@@ -114,6 +114,10 @@ class UI(QWidget):
     def createApple(self):
         x = randint(0, 15)
         y = randint(0, 15)
+        while not self.gameBoard.itemAtPosition(y, x).widget().styleSheet().find("white") == -1:
+            print("MovedApple")
+            x = randint(0, 15)
+            y = randint(0, 15)
         self.gameBoard.itemAtPosition(y, x).widget().setStyleSheet("background-color:red;")
         
 
